@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{77AA2A7F-DE67-4346-8C2A-FF616DBD8337}</ProjectGuid>
+    <ProjectGuid>{6A9E3FB8-708D-4AE9-B012-20780DD02F8A}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>RamenAdmin</RootNamespace>
     <AssemblyName>RamenAdmin</AssemblyName>
