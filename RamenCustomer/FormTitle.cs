@@ -12,41 +12,50 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Threading;
+using System.Reflection.Emit;
 
 namespace RamenCustomer
 {
     public partial class FormTitle : Form
     {
-        TcpClient client;
-        StreamReader Reader;
-        StreamWriter Writer;
-        NetworkStream stream;
-        Thread ReceiveThread;
-        bool Connected;
-        private delegate void SetTextDelegate(string s);
+        TcpClient clientSocket = new TcpClient();
 
         public FormTitle()
         {
             InitializeComponent();
+
+            new Thread(delegate ()
+            {
+                InitSocket();
+            }).Start();
         }
 
-        private void FormTitle_Load(object sender, EventArgs e)
+        private void InitSocket()
         {
-            string IP = "10.10.21.116"; // 연결할 target(Server) IP 주소, 필자는 루프백 주소인 127.0.0.1 사용함
-            int port = 3000;
-
-            client = new TcpClient();
-            client.Connect(IP, port);
-
-            stream = client.GetStream();
-            Connected = true;
-
-            textBox1.AppendText("Connected to Server" + "\r\n");
-            Reader = new StreamReader(stream);
-            Writer = new StreamWriter(stream);
-
-            ReceiveThread = new Thread(new ThreadStart(Receive));
-            ReceiveThread.Start();
+            try
+            {
+                clientSocket.Connect("10.10.21.116", 9999);
+                DisplayText("Client Started");
+                if (InvokeRequired)
+                {
+                    Invoke(new MethodInvoker(delegate ()
+                    {
+                    label1.Text = "Client Socket Program - Server Connected ...";
+                    }));
+                }
+                else
+                {
+                    label1.Text = "Client Socket Program - Server Connected ...";
+                }
+            }
+            catch (SocketException se)
+            {
+                MessageBox.Show(se.Message, "Error");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error");
+            }
         }
 
         private void FormTitle_Click(object sender, EventArgs e)
@@ -59,35 +68,37 @@ namespace RamenCustomer
 
         private void FormTitle_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Connected = false;
-
-            Reader?.Close();
-            Writer?.Close();
-            client?.Close();
-            ReceiveThread?.Abort();
+            clientSocket?.Close();
         }
 
-        private void Receive()
+        private void DisplayText(string text)
         {
-            AddTextDelegate AddText = new AddTextDelegate(textBox1.AppendText);
-
-            while (Connected)
+            if (richTextBox1.InvokeRequired)
             {
-                if (stream.CanRead)
+                richTextBox1.BeginInvoke(new MethodInvoker(delegate
                 {
-                    string ReceiveData = Reader.ReadLine();
-                    if (ReceiveData != null && ReceiveData.Length > 0)
-                        Invoke(AddText, "You: " + ReceiveData + "\r\n");
-                }
+                    richTextBox1.AppendText(Environment.NewLine + " >> " + text);
+                }));
             }
+            else
+                richTextBox1.AppendText(Environment.NewLine + " >> " + text);
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            textBox1.AppendText("Me: " + textBox2.Text + "\r\n");
-            Writer.WriteLine(textBox2.Text);
-            Writer.Flush();
-            textBox2.Clear();
+            NetworkStream stream = clientSocket.GetStream();
+            byte[] sbuffer = Encoding.Unicode.GetBytes(richTextBox2.Text + "$");
+            stream.Write(sbuffer, 0, sbuffer.Length);
+            stream.Flush();
+
+            byte[] rbuffer = new byte[1024];
+            stream.Read(rbuffer, 0, rbuffer.Length);
+            string msg = Encoding.Unicode.GetString(rbuffer);
+            msg = "Data from Server : " + msg;
+            DisplayText(msg);
+
+            richTextBox2.Text = "";
+            richTextBox2.Focus();
         }
     }
 }

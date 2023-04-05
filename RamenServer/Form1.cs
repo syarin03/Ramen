@@ -13,183 +13,100 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.Diagnostics;
 
 namespace RamenServer
 {
     public partial class Form1 : Form
     {
-        public string bufferedList;
-        public List<string> users = new List<string>();
         TcpListener server;
-
-        public void AddText(string text)
-        {
-            myConsole.AppendText(text);
-            myConsole.Select(myConsole.Text.Length, 0);
-            myConsole.ScrollToCaret();
-        }
-
-        void ControlEnter(object sender, EventArgs e)
-        {
-            string input = ControllInput.Text;
-            Controller(input);
-            ControllInput.Text = string.Empty;
-            ControllInput.Focus();
-        }
-
-        void RefreshChatters()
-        {
-            CheckForIllegalCrossThreadCalls = false;
-            while (true)
-            {
-                bufferedList = "**userlist** ";
-                ClientList.Items.Clear();
-                foreach (string user in users)
-                {
-                    ClientList.Items.Add(user);
-                    bufferedList += (user + " ");
-                }
-                Thread.Sleep(1000);
-            }
-        }
-        void OpenServer(object s)
-        {
-            string serverIP = s.ToString().Substring("/open ".Length);
-            TcpClient client = new TcpClient();
-            const int Port = 10203;
-            IPEndPoint serverAddr = new IPEndPoint(IPAddress.Parse(serverIP), Port);
-            server = new TcpListener(serverAddr);
-
-            try
-            {
-                server.Start();
-            }
-            catch (SocketException e)
-            {
-                MessageBox.Show("올바르지 않은 주소입니다.");
-                return;
-            }
-
-            AddText(String.Format("Server Opened. [{0}]\r\n", serverAddr.ToString()));
-            while (true)
-            {
-                try
-                {
-                    client = server.AcceptTcpClient();
-                    NetworkStream stream = client.GetStream();
-                    byte[] buffer = new byte[1024];
-                    int bytes = stream.Read(buffer, 0, buffer.Length);
-                    string userID = Encoding.Default.GetString(buffer, 0, bytes);
-                    users.Add(userID);
-                    MyChatServer mychat = new MyChatServer(client, userID, this);
-                    Thread serverThread = new Thread(new ThreadStart(mychat.Listen));
-                    serverThread.IsBackground = true;
-                    serverThread.Start();
-                }
-                catch (Exception e) { break; }
-            }
-            client.Close();
-            server.Stop();
-        }
-
-        void CloseServer()
-        {
-            // 서버 닫는 처리
-        }
-
-        void Controller(string s)
-        {
-            if (s.Equals(string.Empty)) return;
-            else if (s.Equals("/close"))
-            {
-                CloseServer();
-                AddText("[Server] Closed.\r\n");
-            }
-            else if (s.StartsWith("/open "))
-            {
-                Thread open = new Thread(OpenServer);
-                open.IsBackground = true;
-                open.Start(s);
-            }
-        }
+        TcpClient client;
+        static int counter = 0;
+        Thread t;
 
         public Form1()
         {
             InitializeComponent();
-        }
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            Thread refresher = new Thread(RefreshChatters);
-            refresher.IsBackground = true;
-            refresher.Start();
-        }
-
-        private void Listen()
-        {
-            AddTextDelegate addText = new AddTextDelegate(ControllInput.AppendText);
-
-            IPAddress addr = IPAddress.Parse("127.0.0.1");
-            int port = 3000;
-            server = new TcpListener(addr, port);
-            server.Start();
-
-            Invoke(addText, "Server Start\r\n");
-
-            client = server.AcceptTcpClient();
-            Connected = true;
-
-            Invoke(addText, "Connected to Client\r\n");
-
-            stream = client.GetStream();
-            Reader = new StreamReader(stream);
-            Writer = new StreamWriter(stream);
-
-            ReceiveThread = new Thread(new ThreadStart(Receive));
-            ReceiveThread.Start();
-        }
-
-        private void Receive()
-        {
-            AddTextDelegate AddText = new AddTextDelegate(ControllInput.AppendText);
-
-            while (Connected)
+            t = new Thread(InitSocket)
             {
-                // stream에 data 있을 경우 
-                if (stream.CanRead)
+                IsBackground = true
+            };
+            t.Start();
+        }
+
+        private void InitSocket()
+        {
+            server = new TcpListener(IPAddress.Any, 9999);
+            client = default;
+            server.Start();
+            DisplayText(">> Server Started");
+
+            while (true)
+            {
+                try
                 {
-                    string receiveChat = Reader.ReadLine();
-                    if (receiveChat != null && receiveChat.Length > 0)
-                        Invoke(AddText, "You: " + receiveChat + "\r\n");
+                    counter++;
+                    client = server.AcceptTcpClient();
+                    DisplayText(">> Accept connection from client");
+
+                    handleClient h_client = new handleClient();
+                    h_client.OnReceived += new handleClient.MessageDisplayHandler(DisplayText);
+                    h_client.OnCalculated += new handleClient.CalculateClientCounter(CalculateCounter);
+                    h_client.startClient(client, counter);
+                }
+                catch (SocketException se)
+                {
+                    Trace.WriteLine(string.Format("InitSocket - SocketException : {0}", se.Message));
+                    break;  // while loop 종료
+                }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine(string.Format("InitSocket - Exception : {0}", ex.Message));
                 }
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void CalculateCounter()
         {
-            //char room에 sender message 추가
-            ControllInput.AppendText("Me: " + textBox2.Text + "\r\n");
+            counter--;
+        }
 
-            //Client에 chat send
-            Writer.WriteLine(textBox2.Text);
-            Writer.Flush();
-
-            textBox2.Clear();
+        private void DisplayText(string text)
+        {
+            if (richTextBox1.InvokeRequired)
+            {
+                richTextBox1.BeginInvoke(new MethodInvoker(delegate
+                {
+                    richTextBox1.AppendText(text + Environment.NewLine);
+                }));
+            }
+            else
+                richTextBox1.AppendText(text + Environment.NewLine);
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Connected = false;
-            Reader?.Close();
-            Writer?.Close();
-            server?.Stop();
-            client?.Close();
-            ReceiveThread?.Abort();
-        }
+            if (client != null)
+            {
+                client.Close();
+                client = null;
+            }
 
-        private void ControllInput_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Return) ControlEnter(sender, e);
+            if (server != null)
+            {
+                server.Stop();
+                server = null;
+            }
+
+            t.Join();  // 스레드 중지 대기
+
+            // 새로운 스레드 시작
+            t = new Thread(InitSocket)
+            {
+                IsBackground = true
+            };
+            t.Start();
         }
     }
 }
