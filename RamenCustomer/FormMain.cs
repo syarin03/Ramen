@@ -36,7 +36,6 @@ namespace RamenCustomer
             Dictionary<string, object> sendData = new Dictionary<string, object>
             {
                 { "method", "FormMain_Load" },
-                { "price", 1500 }
             };
 
             BinaryFormatter bf = new BinaryFormatter();

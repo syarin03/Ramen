@@ -1,51 +1,76 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Net;
-using System.Runtime.Remoting.Contexts;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using System.Diagnostics;
+using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
 namespace RamenServer
 {
-    public partial class Form1 : Form
+    public class ServerManager
     {
-        public Socket clientSocket;
+        Socket clientSocket;
         List<Socket> connectedClients = new List<Socket>();
         IPAddress thisAddress;
+        int port = 3000;
+        public delegate void AppendText(string str);
+        bool isClosed;
 
-        public Form1()
+        public ServerManager()
         {
-            InitializeComponent();
+
+        }
+
+        public void Start()
+        {
             clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
+            IPHostEntry he = Dns.GetHostEntry(Dns.GetHostName());
+
+            foreach (IPAddress addr in he.AddressList)
+            {
+                if (addr.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    thisAddress = addr;
+                    break;
+                }
+            }
+
+            if (thisAddress == null)
+                thisAddress = IPAddress.Loopback;
+
+            IPEndPoint serverEP = new IPEndPoint(thisAddress, port);
+
+            clientSocket.Bind(serverEP);
+            clientSocket.Listen(10);
+            clientSocket.BeginAccept(AcceptCallback, null);
+
+            AddLog("Server Start");
+            isClosed = false;
         }
 
         void AcceptCallback(IAsyncResult ar)
         {
-            Socket client = clientSocket.EndAccept(ar);
-
-            AsyncObject obj = new AsyncObject(4096)
+            if (!isClosed)
             {
-                WorkingSocket = client
-            };
+                Socket client = clientSocket.EndAccept(ar);
 
-            connectedClients.Add(client);
-            foreach (Socket c in connectedClients)
-            {
-                Console.WriteLine(c.RemoteEndPoint.ToString());
+                AsyncObject obj = new AsyncObject(4096)
+                {
+                    WorkingSocket = client
+                };
+
+                connectedClients.Add(client);
+                foreach (Socket c in connectedClients)
+                {
+                    AddLog($"Client \"{c.RemoteEndPoint}\" Connect");
+                }
+
+                client.BeginReceive(obj.Buffer, 0, 4096, 0, DataReceived, obj);
             }
-
-            client.BeginReceive(obj.Buffer, 0, 4096, 0, DataReceived, obj);
         }
 
         void DataReceived(IAsyncResult ar)
@@ -53,18 +78,20 @@ namespace RamenServer
             AsyncObject obj = (AsyncObject)ar.AsyncState;
 
             int received = 0;
+
             try
             {
                 received = obj.WorkingSocket.EndReceive(ar);
             }
-            catch (SocketException ex)
+            catch (SocketException)
             {
+                AddLog($"Client \"{obj.WorkingSocket.RemoteEndPoint}\" Disconnect");
                 obj.WorkingSocket.Close();
                 connectedClients.Remove(obj.WorkingSocket);
                 clientSocket.BeginAccept(AcceptCallback, null);
                 return;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 obj.WorkingSocket.Close();
                 connectedClients.Remove(obj.WorkingSocket);
@@ -87,16 +114,15 @@ namespace RamenServer
 
             if (receivedData["method"].ToString() == "button1")
             {
-                Console.WriteLine("button1");
+                AddLog($"Client Send \"{receivedData["method"]}\" Method");
             }
 
-            for (int i = connectedClients.Count - 1; i >= 0; i--)
+            foreach (Socket s in connectedClients)
             {
-                Socket socket = connectedClients[i];
-
-                if (socket.Handle != obj.WorkingSocket.Handle)
+                if (s.Handle != obj.WorkingSocket.Handle)
                 {
-                    socket.Send(obj.Buffer);
+                    s.Send(obj.Buffer);
+                    AddLog($"Server Send \"{obj.Buffer}\"");
                 }
             }
 
@@ -105,32 +131,25 @@ namespace RamenServer
             obj.WorkingSocket.BeginReceive(obj.Buffer, 0, 4096, 0, DataReceived, obj);
         }
 
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        public void Stop()
         {
-
+            isClosed = true;
+            clientSocket.Close();
+            clientSocket.Dispose();
+            AddLog("Server Close");
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        public void Reboot()
         {
-            IPHostEntry he = Dns.GetHostEntry(Dns.GetHostName());
+            Stop();
+            Start();
+        }
 
-            foreach (IPAddress addr in he.AddressList)
-            {
-                if (addr.AddressFamily == AddressFamily.InterNetwork)
-                {
-                    thisAddress = addr;
-                    break;
-                }
-            }
+        public static event AppendText AT;
 
-            if (thisAddress == null)
-                thisAddress = IPAddress.Loopback;
-
-            IPEndPoint serverEP = new IPEndPoint(thisAddress, 3000);
-            clientSocket.Bind(serverEP);
-            clientSocket.Listen(10);
-
-            clientSocket.BeginAccept(AcceptCallback, null);
+        public static void AddLog(string log)
+        {
+            AT(log);
         }
     }
 
@@ -139,6 +158,7 @@ namespace RamenServer
         public byte[] Buffer;
         public Socket WorkingSocket;
         public readonly int BufferSize;
+
         public AsyncObject(int bufferSize)
         {
             BufferSize = bufferSize;

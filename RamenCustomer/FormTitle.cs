@@ -71,6 +71,17 @@ namespace RamenCustomer
 
         private void button1_Click(object sender, EventArgs e)
         {
+            Dictionary<string, object> sendData = new Dictionary<string, object>
+            {
+                { "method", "button1" },
+                { "price", 1500 }
+            };
+
+            SendData(sendData);
+        }
+
+        private void SendData(Dictionary<string, object> sendData)
+        {
             if (clientSocket == null || !clientSocket.Connected)
             {
                 MessageBox.Show("서버와 연결되어 있지 않습니다!");
@@ -82,12 +93,6 @@ namespace RamenCustomer
                 MessageBox.Show("서버가 실행되고 있지 않습니다!");
                 return;
             }
-
-            Dictionary<string, object> sendData = new Dictionary<string, object>
-            {
-                { "method", "button1" },
-                { "price", 1500 }
-            };
 
             BinaryFormatter bf = new BinaryFormatter();
             MemoryStream ms = new MemoryStream();
