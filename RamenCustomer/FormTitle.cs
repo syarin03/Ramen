@@ -1,103 +1,155 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Net.Sockets;
 using System.Net;
+using System.Net.Sockets;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace RamenCustomer
 {
     public partial class FormTitle : Form
     {
-        TcpClient clientSocket = new TcpClient();
+        public Socket clientSocket;
 
         public FormTitle()
         {
             InitializeComponent();
+            clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
 
-            new Thread(delegate ()
-            {
-                InitSocket();
-            }).Start();
         }
 
-        private void InitSocket()
+        static void DataReceived(IAsyncResult ar)
         {
+            AsyncObject obj = (AsyncObject)ar.AsyncState;
+
+            int received = 0;
+
             try
             {
-                clientSocket.Connect("10.10.21.116", 9999);
-                DisplayText("Client Started");
-                if (InvokeRequired)
-                {
-                    Invoke(new MethodInvoker(delegate ()
-                    {
-                    label1.Text = "Client Socket Program - Server Connected ...";
-                    }));
-                }
-                else
-                {
-                    label1.Text = "Client Socket Program - Server Connected ...";
-                }
+                received = obj.WorkingSocket.EndReceive(ar);
             }
-            catch (SocketException se)
+            catch (Exception)
             {
-                MessageBox.Show(se.Message, "Error");
+                return;
             }
-            catch (Exception ex)
+
+            if (received <= 0)
             {
-                MessageBox.Show(ex.Message, "Error");
+                obj.WorkingSocket.Close();
+                return;
             }
+
+            byte[] receivedBytes = new byte[received];
+            Array.Copy(obj.Buffer, receivedBytes, received);
+
+            BinaryFormatter bf = new BinaryFormatter();
+            MemoryStream ms = new MemoryStream(receivedBytes);
+            Dictionary<string, object> receivedData = (Dictionary<string, object>)bf.Deserialize(ms);
+
+            if (receivedData["method"].ToString() == "button1")
+            {
+                Console.WriteLine("button1");
+            }
+
+            obj.ClearBuffer();
+            obj.WorkingSocket.BeginReceive(obj.Buffer, 0, 4096, 0, DataReceived, obj);
         }
 
         private void FormTitle_Click(object sender, EventArgs e)
         {
-            //string sendData = "hello";  // testBox3 의 내용을 sendData1 변수에 저장
-            //Writer.WriteLine(sendData);  // 스트림라이터를 통해 데이타를 전송
-            //FormMain formMain = new FormMain(this);
-            //formMain.Show();
+            FormMain formMain = new FormMain(this);
+            formMain.Show();
         }
 
         private void FormTitle_FormClosing(object sender, FormClosingEventArgs e)
         {
-            clientSocket?.Close();
-        }
-
-        private void DisplayText(string text)
-        {
-            if (richTextBox1.InvokeRequired)
-            {
-                richTextBox1.BeginInvoke(new MethodInvoker(delegate
-                {
-                    richTextBox1.AppendText(Environment.NewLine + " >> " + text);
-                }));
-            }
-            else
-                richTextBox1.AppendText(Environment.NewLine + " >> " + text);
+            //clientSocket?.Close();
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            NetworkStream stream = clientSocket.GetStream();
-            byte[] sbuffer = Encoding.Unicode.GetBytes(richTextBox2.Text + "$");
-            stream.Write(sbuffer, 0, sbuffer.Length);
-            stream.Flush();
+            if (clientSocket == null || !clientSocket.Connected)
+            {
+                MessageBox.Show("서버와 연결되어 있지 않습니다!");
+                return;
+            }
 
-            byte[] rbuffer = new byte[1024];
-            stream.Read(rbuffer, 0, rbuffer.Length);
-            string msg = Encoding.Unicode.GetString(rbuffer);
-            msg = "Data from Server : " + msg;
-            DisplayText(msg);
+            if (!clientSocket.IsBound)
+            {
+                MessageBox.Show("서버가 실행되고 있지 않습니다!");
+                return;
+            }
 
-            richTextBox2.Text = "";
-            richTextBox2.Focus();
+            Dictionary<string, object> sendData = new Dictionary<string, object>
+            {
+                { "method", "button1" },
+                { "price", 1500 }
+            };
+
+            BinaryFormatter bf = new BinaryFormatter();
+            MemoryStream ms = new MemoryStream();
+            bf.Serialize(ms, sendData);
+            byte[] bytes = ms.ToArray();
+
+            try
+            {
+                clientSocket.Send(bytes);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("소켓이 폐기되었습니다! 오류 내용: " + ex.Message);
+            }
+        }
+
+        private void FormTitle_Load(object sender, EventArgs e)
+        {
+            IPHostEntry he = Dns.GetHostEntry(Dns.GetHostName());
+
+            IPAddress defaultHostAddress = null;
+            foreach (IPAddress addr in he.AddressList)
+            {
+                if (addr.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    defaultHostAddress = addr;
+                    break;
+                }
+            }
+
+            if (defaultHostAddress == null)
+                _ = IPAddress.Loopback;
+
+            try { clientSocket.Connect(defaultHostAddress, 3000); }
+            catch (Exception ex)
+            {
+                MessageBox.Show("연결에 실패했습니다!\n오류 내용: {0}", ex.Message);
+                return;
+            }
+
+            AsyncObject obj = new AsyncObject(4096)
+            {
+                WorkingSocket = clientSocket
+            };
+            clientSocket.BeginReceive(obj.Buffer, 0, obj.BufferSize, 0, DataReceived, obj);
+        }
+    }
+
+    public class AsyncObject
+    {
+        public byte[] Buffer;
+        public Socket WorkingSocket;
+        public readonly int BufferSize;
+        public AsyncObject(int bufferSize)
+        {
+            BufferSize = bufferSize;
+            Buffer = new byte[BufferSize];
+        }
+
+        public void ClearBuffer()
+        {
+            Array.Clear(Buffer, 0, BufferSize);
         }
     }
 }

@@ -14,99 +14,140 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Diagnostics;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace RamenServer
 {
     public partial class Form1 : Form
     {
-        TcpListener server;
-        TcpClient client;
-        static int counter = 0;
-        Thread t;
+        public Socket clientSocket;
+        List<Socket> connectedClients = new List<Socket>();
+        IPAddress thisAddress;
 
         public Form1()
         {
             InitializeComponent();
+            clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.IP);
+        }
 
-            t = new Thread(InitSocket)
+        void AcceptCallback(IAsyncResult ar)
+        {
+            Socket client = clientSocket.EndAccept(ar);
+
+            AsyncObject obj = new AsyncObject(4096)
             {
-                IsBackground = true
+                WorkingSocket = client
             };
-            t.Start();
+
+            connectedClients.Add(client);
+            foreach (Socket c in connectedClients)
+            {
+                Console.WriteLine(c.RemoteEndPoint.ToString());
+            }
+
+            client.BeginReceive(obj.Buffer, 0, 4096, 0, DataReceived, obj);
         }
 
-        private void InitSocket()
+        void DataReceived(IAsyncResult ar)
         {
-            server = new TcpListener(IPAddress.Any, 9999);
-            client = default;
-            server.Start();
-            DisplayText(">> Server Started");
+            AsyncObject obj = (AsyncObject)ar.AsyncState;
 
-            while (true)
+            int received = 0;
+            try
             {
-                try
-                {
-                    counter++;
-                    client = server.AcceptTcpClient();
-                    DisplayText(">> Accept connection from client");
+                received = obj.WorkingSocket.EndReceive(ar);
+            }
+            catch (SocketException ex)
+            {
+                obj.WorkingSocket.Close();
+                connectedClients.Remove(obj.WorkingSocket);
+                clientSocket.BeginAccept(AcceptCallback, null);
+                return;
+            }
+            catch (Exception ex)
+            {
+                obj.WorkingSocket.Close();
+                connectedClients.Remove(obj.WorkingSocket);
+                clientSocket.BeginAccept(AcceptCallback, null);
+                return;
+            }
 
-                    handleClient h_client = new handleClient();
-                    h_client.OnReceived += new handleClient.MessageDisplayHandler(DisplayText);
-                    h_client.OnCalculated += new handleClient.CalculateClientCounter(CalculateCounter);
-                    h_client.startClient(client, counter);
-                }
-                catch (SocketException se)
+            if (received <= 0)
+            {
+                obj.WorkingSocket.Close();
+                return;
+            }
+
+            byte[] receivedBytes = new byte[received];
+            Array.Copy(obj.Buffer, receivedBytes, received);
+
+            BinaryFormatter bf = new BinaryFormatter();
+            MemoryStream ms = new MemoryStream(receivedBytes);
+            Dictionary<string, object> receivedData = (Dictionary<string, object>)bf.Deserialize(ms);
+
+            if (receivedData["method"].ToString() == "button1")
+            {
+                Console.WriteLine("button1");
+            }
+
+            for (int i = connectedClients.Count - 1; i >= 0; i--)
+            {
+                Socket socket = connectedClients[i];
+
+                if (socket.Handle != obj.WorkingSocket.Handle)
                 {
-                    Trace.WriteLine(string.Format("InitSocket - SocketException : {0}", se.Message));
-                    break;  // while loop 종료
-                }
-                catch (Exception ex)
-                {
-                    Trace.WriteLine(string.Format("InitSocket - Exception : {0}", ex.Message));
+                    socket.Send(obj.Buffer);
                 }
             }
-        }
 
-        private void CalculateCounter()
-        {
-            counter--;
-        }
+            obj.ClearBuffer();
 
-        private void DisplayText(string text)
-        {
-            if (richTextBox1.InvokeRequired)
-            {
-                richTextBox1.BeginInvoke(new MethodInvoker(delegate
-                {
-                    richTextBox1.AppendText(text + Environment.NewLine);
-                }));
-            }
-            else
-                richTextBox1.AppendText(text + Environment.NewLine);
+            obj.WorkingSocket.BeginReceive(obj.Buffer, 0, 4096, 0, DataReceived, obj);
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (client != null)
+
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            IPHostEntry he = Dns.GetHostEntry(Dns.GetHostName());
+
+            foreach (IPAddress addr in he.AddressList)
             {
-                client.Close();
-                client = null;
+                if (addr.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    thisAddress = addr;
+                    break;
+                }
             }
 
-            if (server != null)
-            {
-                server.Stop();
-                server = null;
-            }
+            if (thisAddress == null)
+                thisAddress = IPAddress.Loopback;
 
-            t.Join();  // 스레드 중지 대기
+            IPEndPoint serverEP = new IPEndPoint(thisAddress, 3000);
+            clientSocket.Bind(serverEP);
+            clientSocket.Listen(10);
 
-            // 새로운 스레드 시작
-            t = new Thread(InitSocket)
-            {
-                IsBackground = true
-            };
-            t.Start();
+            clientSocket.BeginAccept(AcceptCallback, null);
+        }
+    }
+
+    public class AsyncObject
+    {
+        public byte[] Buffer;
+        public Socket WorkingSocket;
+        public readonly int BufferSize;
+        public AsyncObject(int bufferSize)
+        {
+            BufferSize = bufferSize;
+            Buffer = new byte[BufferSize];
+        }
+
+        public void ClearBuffer()
+        {
+            Array.Clear(Buffer, 0, BufferSize);
         }
     }
 }
