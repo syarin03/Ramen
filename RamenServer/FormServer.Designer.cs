@@ -28,103 +28,140 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.LogHistory = new System.Windows.Forms.RichTextBox();
-            this.BtnServerStart = new System.Windows.Forms.Button();
-            this.BtnServerStop = new System.Windows.Forms.Button();
-            this.BtnServerReboot = new System.Windows.Forms.Button();
+            this.LogHistory = new Sunny.UI.UIRichTextBox();
+            this.BtnServerStart = new Sunny.UI.UIButton();
+            this.BtnServerStop = new Sunny.UI.UIButton();
+            this.BtnServerReboot = new Sunny.UI.UIButton();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.flowLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // LogHistory
             // 
-            this.LogHistory.Font = new System.Drawing.Font("맑은 고딕", 9F);
-            this.LogHistory.Location = new System.Drawing.Point(12, 13);
+            this.LogHistory.FillColor = System.Drawing.Color.White;
+            this.LogHistory.Font = new System.Drawing.Font("나눔바른고딕", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.LogHistory.Location = new System.Drawing.Point(3, 39);
             this.LogHistory.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.LogHistory.MinimumSize = new System.Drawing.Size(1, 1);
             this.LogHistory.Name = "LogHistory";
+            this.LogHistory.Padding = new System.Windows.Forms.Padding(2);
             this.LogHistory.ReadOnly = true;
-            this.LogHistory.Size = new System.Drawing.Size(760, 467);
+            this.LogHistory.RectColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+            this.LogHistory.ScrollBarColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+            this.LogHistory.ShowText = false;
+            this.LogHistory.Size = new System.Drawing.Size(870, 517);
+            this.LogHistory.Style = Sunny.UI.UIStyle.Custom;
+            this.LogHistory.StyleCustomMode = true;
             this.LogHistory.TabIndex = 0;
-            this.LogHistory.Text = "";
+            this.LogHistory.TextAlignment = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // BtnServerStart
             // 
-            this.BtnServerStart.AutoSize = true;
-            this.BtnServerStart.Font = new System.Drawing.Font("맑은 고딕", 9F);
-            this.BtnServerStart.Location = new System.Drawing.Point(3, 4);
-            this.BtnServerStart.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.BtnServerStart.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.BtnServerStart.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+            this.BtnServerStart.FillColor2 = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+            this.BtnServerStart.FillHoverColor = System.Drawing.Color.FromArgb(((int)(((byte)(178)))), ((int)(((byte)(178)))), ((int)(((byte)(245)))));
+            this.BtnServerStart.FillPressColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
+            this.BtnServerStart.FillSelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
+            this.BtnServerStart.Font = new System.Drawing.Font("나눔바른고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.BtnServerStart.Location = new System.Drawing.Point(3, 3);
+            this.BtnServerStart.MinimumSize = new System.Drawing.Size(1, 1);
             this.BtnServerStart.Name = "BtnServerStart";
-            this.BtnServerStart.Size = new System.Drawing.Size(247, 50);
-            this.BtnServerStart.TabIndex = 1;
+            this.BtnServerStart.RectColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+            this.BtnServerStart.RectHoverColor = System.Drawing.Color.FromArgb(((int)(((byte)(178)))), ((int)(((byte)(178)))), ((int)(((byte)(245)))));
+            this.BtnServerStart.RectPressColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
+            this.BtnServerStart.RectSelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
+            this.BtnServerStart.Size = new System.Drawing.Size(284, 50);
+            this.BtnServerStart.Style = Sunny.UI.UIStyle.Custom;
+            this.BtnServerStart.StyleCustomMode = true;
+            this.BtnServerStart.TabIndex = 0;
             this.BtnServerStart.Text = "서버 가동";
-            this.BtnServerStart.UseVisualStyleBackColor = true;
             this.BtnServerStart.Click += new System.EventHandler(this.BtnServerStart_Click);
             // 
             // BtnServerStop
             // 
-            this.BtnServerStop.AutoSize = true;
-            this.BtnServerStop.Font = new System.Drawing.Font("맑은 고딕", 9F);
-            this.BtnServerStop.Location = new System.Drawing.Point(256, 4);
-            this.BtnServerStop.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.BtnServerStop.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.BtnServerStop.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+            this.BtnServerStop.FillColor2 = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+            this.BtnServerStop.FillHoverColor = System.Drawing.Color.FromArgb(((int)(((byte)(178)))), ((int)(((byte)(178)))), ((int)(((byte)(245)))));
+            this.BtnServerStop.FillPressColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
+            this.BtnServerStop.FillSelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
+            this.BtnServerStop.Font = new System.Drawing.Font("나눔바른고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.BtnServerStop.Location = new System.Drawing.Point(293, 3);
+            this.BtnServerStop.MinimumSize = new System.Drawing.Size(1, 1);
             this.BtnServerStop.Name = "BtnServerStop";
-            this.BtnServerStop.Size = new System.Drawing.Size(247, 50);
-            this.BtnServerStop.TabIndex = 2;
-            this.BtnServerStop.Text = "서버 중단";
-            this.BtnServerStop.UseVisualStyleBackColor = true;
+            this.BtnServerStop.RectColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+            this.BtnServerStop.RectHoverColor = System.Drawing.Color.FromArgb(((int)(((byte)(178)))), ((int)(((byte)(178)))), ((int)(((byte)(245)))));
+            this.BtnServerStop.RectPressColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
+            this.BtnServerStop.RectSelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
+            this.BtnServerStop.Size = new System.Drawing.Size(284, 50);
+            this.BtnServerStop.Style = Sunny.UI.UIStyle.Custom;
+            this.BtnServerStop.StyleCustomMode = true;
+            this.BtnServerStop.TabIndex = 0;
+            this.BtnServerStop.Text = "서버 중지";
             this.BtnServerStop.Click += new System.EventHandler(this.BtnServerStop_Click);
             // 
             // BtnServerReboot
             // 
-            this.BtnServerReboot.AutoSize = true;
-            this.BtnServerReboot.Font = new System.Drawing.Font("맑은 고딕", 9F);
-            this.BtnServerReboot.Location = new System.Drawing.Point(509, 4);
-            this.BtnServerReboot.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.BtnServerReboot.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.BtnServerReboot.FillColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+            this.BtnServerReboot.FillColor2 = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+            this.BtnServerReboot.FillHoverColor = System.Drawing.Color.FromArgb(((int)(((byte)(178)))), ((int)(((byte)(178)))), ((int)(((byte)(245)))));
+            this.BtnServerReboot.FillPressColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
+            this.BtnServerReboot.FillSelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
+            this.BtnServerReboot.Font = new System.Drawing.Font("나눔바른고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.BtnServerReboot.Location = new System.Drawing.Point(583, 3);
+            this.BtnServerReboot.MinimumSize = new System.Drawing.Size(1, 1);
             this.BtnServerReboot.Name = "BtnServerReboot";
-            this.BtnServerReboot.Size = new System.Drawing.Size(247, 50);
-            this.BtnServerReboot.TabIndex = 3;
+            this.BtnServerReboot.RectColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+            this.BtnServerReboot.RectHoverColor = System.Drawing.Color.FromArgb(((int)(((byte)(178)))), ((int)(((byte)(178)))), ((int)(((byte)(245)))));
+            this.BtnServerReboot.RectPressColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
+            this.BtnServerReboot.RectSelectedColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
+            this.BtnServerReboot.Size = new System.Drawing.Size(284, 50);
+            this.BtnServerReboot.Style = Sunny.UI.UIStyle.Custom;
+            this.BtnServerReboot.StyleCustomMode = true;
+            this.BtnServerReboot.TabIndex = 0;
             this.BtnServerReboot.Text = "서버 재가동";
-            this.BtnServerReboot.UseVisualStyleBackColor = true;
             this.BtnServerReboot.Click += new System.EventHandler(this.BtnServerReboot_Click);
             // 
             // flowLayoutPanel1
             // 
-            this.flowLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.flowLayoutPanel1.Controls.Add(this.BtnServerStart);
             this.flowLayoutPanel1.Controls.Add(this.BtnServerStop);
             this.flowLayoutPanel1.Controls.Add(this.BtnServerReboot);
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(12, 488);
-            this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.flowLayoutPanel1.Font = new System.Drawing.Font("나눔바른고딕", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(129)));
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(3, 560);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(760, 60);
-            this.flowLayoutPanel1.TabIndex = 4;
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(870, 60);
+            this.flowLayoutPanel1.TabIndex = 1;
             // 
             // FormServer
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(784, 561);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+            this.ClientSize = new System.Drawing.Size(876, 623);
             this.Controls.Add(this.flowLayoutPanel1);
             this.Controls.Add(this.LogHistory);
-            this.Font = new System.Drawing.Font("맑은 고딕", 9F);
+            this.Font = new System.Drawing.Font("나눔바른고딕", 9F);
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "FormServer";
-            this.Text = "Form1";
+            this.RectColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+            this.Style = Sunny.UI.UIStyle.Custom;
+            this.Text = "Ramen Server";
+            this.TitleColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(192)))), ((int)(((byte)(255)))));
+            this.ZoomScaleRect = new System.Drawing.Rectangle(15, 15, 784, 561);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormServer_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.flowLayoutPanel1.ResumeLayout(false);
-            this.flowLayoutPanel1.PerformLayout();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.RichTextBox LogHistory;
-        private System.Windows.Forms.Button BtnServerStart;
-        private System.Windows.Forms.Button BtnServerStop;
-        private System.Windows.Forms.Button BtnServerReboot;
+        private Sunny.UI.UIRichTextBox LogHistory;
+        private Sunny.UI.UIButton BtnServerStart;
+        private Sunny.UI.UIButton BtnServerStop;
+        private Sunny.UI.UIButton BtnServerReboot;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
     }
 }

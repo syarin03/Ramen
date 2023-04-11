@@ -15,32 +15,33 @@ using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Diagnostics;
 using System.Runtime.Serialization.Formatters.Binary;
+using Sunny.UI;
 
 namespace RamenServer
 {
-    public partial class FormServer : Form
+    public partial class FormServer : UIForm
     {
-        ServerManager manager;
+        TcpServerManager serverManager;
 
         public FormServer()
         {
             InitializeComponent();
-            manager = new ServerManager();
+            serverManager = new TcpServerManager();
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            ServerManager.AT += new ServerManager.AppendText(AppendText);
+            TcpServerManager.Append += new TcpServerManager.AppendText(AppendText);
         }
 
         private void BtnServerStart_Click(object sender, EventArgs e)
         {
-            manager.Start();
+            serverManager.ServerStart();
         }
 
         private void BtnServerStop_Click(object sender, EventArgs e)
         {
-            manager.Stop();
+            serverManager.ServerStop();
         }
 
         private void AppendText(string s)
@@ -51,23 +52,26 @@ namespace RamenServer
                 {
                     LogHistory.AppendText(DateTime.Now.ToString() + ": " + s);
                     LogHistory.AppendText("\r\n");
+                    LogHistory.ScrollToCaret();
                 }));
             }
             else
             {
                 LogHistory.AppendText(DateTime.Now.ToString() + ": " + s);
                 LogHistory.AppendText("\r\n");
+                LogHistory.ScrollToCaret();
             }
         }
 
         private void BtnServerReboot_Click(object sender, EventArgs e)
         {
-            manager.Reboot();
+            serverManager.ServerStop();
+            Thread.Sleep(1000);
+            serverManager.ServerStart();
         }
 
         private void FormServer_FormClosing(object sender, FormClosingEventArgs e)
         {
-            manager.Stop();
-        }
+        }   
     }
 }

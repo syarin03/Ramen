@@ -10,20 +10,28 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Sunny.UI;
 
 namespace RamenCustomer
 {
-    public partial class FormMain : Form
+    public partial class FormMain : UIForm
     {
-        readonly Socket clientSocket;
-        readonly FormTitle formTitle;
+        TcpClientManager clientManager;
+        FormTitle formTitle;
 
-        public FormMain(FormTitle form)
+        public FormMain(FormTitle form, object tcm)
         {
             InitializeComponent();
             formTitle = form;
             formTitle.Hide();
-            clientSocket = form.clientSocket;
+            clientManager = (TcpClientManager)tcm;
+            Dictionary<string, object> d = new Dictionary<string, object>
+            {
+                { "method", "FormMainLoad" }
+            };
+            clientManager.SendData(d);
+
+            //TabMenu.ItemSize = new Size((TabMenu.Width / TabMenu.TabPages.Count) - 1, TabMenu.ItemSize.Height);
         }
 
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
@@ -31,19 +39,33 @@ namespace RamenCustomer
             formTitle.Show();
         }
 
-        private void FormMain_Load(object sender, EventArgs e)
+        private void BtnMainToTitle_Click(object sender, EventArgs e)
         {
-            Dictionary<string, object> sendData = new Dictionary<string, object>
+            Close();
+            formTitle.Show();
+        }
+
+        private void uiButton2_Click(object sender, EventArgs e)
+        {
+            UIImageButton btn = new UIImageButton
             {
-                { "method", "FormMain_Load" },
+                Size = new Size(258, 258),
+                Parent = this,
+                Name = "newbtn",
+                Text = "newbtn",
+                TextAlign = ContentAlignment.BottomCenter,
+                Image = Image.FromFile(@"C:\Users\user\Downloads\image.png"),
+                SizeMode = PictureBoxSizeMode.StretchImage,
             };
+            btn.Click += SelectRamen;
+            LayoutSelectRamen.Controls.Add(btn);
+        }
 
-            BinaryFormatter bf = new BinaryFormatter();
-            MemoryStream ms = new MemoryStream();
-            bf.Serialize(ms, sendData);
-            byte[] bytes = ms.ToArray();
-
-            clientSocket.Send(bytes);
+        private void SelectRamen(object sender, EventArgs e)
+        {
+            UIImageButton btn = (UIImageButton)sender;
+            FormMenuDetail formMenuDetail = new FormMenuDetail(btn.Text);
+            formMenuDetail.Show();
         }
     }
 }

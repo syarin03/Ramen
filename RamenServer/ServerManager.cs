@@ -111,11 +111,12 @@ namespace RamenServer
             BinaryFormatter bf = new BinaryFormatter();
             MemoryStream ms = new MemoryStream(receivedBytes);
             Dictionary<string, object> receivedData = (Dictionary<string, object>)bf.Deserialize(ms);
+            AddLog($"Client Send \"{receivedData["method"]}\" Method");
 
-            if (receivedData["method"].ToString() == "button1")
-            {
-                AddLog($"Client Send \"{receivedData["method"]}\" Method");
-            }
+            //if (receivedData["method"].ToString() == "button1")
+            //{
+                
+            //}
 
             foreach (Socket s in connectedClients)
             {
@@ -134,8 +135,8 @@ namespace RamenServer
         public void Stop()
         {
             isClosed = true;
-            clientSocket.Close();
-            clientSocket.Dispose();
+            clientSocket?.Close();
+            clientSocket?.Dispose();
             AddLog("Server Close");
         }
 
