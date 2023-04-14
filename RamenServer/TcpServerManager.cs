@@ -5,6 +5,10 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using MySql.Data.MySqlClient;
+using System.Management;
+using System.Data;
+using MySqlX.XDevAPI;
 
 namespace RamenServer
 {
@@ -20,6 +24,7 @@ namespace RamenServer
         public TcpServerManager()
         {
             listener = new TcpListener(IPAddress.Any, 2869); // 아무 아이피나 2869포트를 통해서 접속 가능한 리스너
+            DatabaseManager.ConnectTest();
         }
 
         public void ServerStart()
@@ -63,7 +68,7 @@ namespace RamenServer
                     AddLog($"Client \"{client.Client.RemoteEndPoint}\" Connect");
 
                     Thread clientThread = new Thread(() => ReceiveData(client))
-                    {
+                    {   
                         IsBackground = true
                     };
                     clientThread.Start();
@@ -115,13 +120,16 @@ namespace RamenServer
 
                 Dictionary<string, object> receiveDataDict = ReceiveDataQueue.Dequeue();
                 string method = receiveDataDict["method"].ToString();
-                AddLog(method);
+                AddLog($"Client Send \"{method}\" Method");
+                Dictionary<string, object> sendDataDict = new Dictionary<string, object>();
 
                 // 받은 데이터 처리하는 코드
                 switch (method)
                 {
-                    case "helloworld":
-                        AddLog("helloworld");
+                    case "LoadMenu":
+                        sendDataDict.Add("method", "LoadMenuResult");
+                        List<string> menuList = LoadMenu();
+                        sendDataDict.Add("result", menuList);
                         break;
                     case "what":
                         AddLog("what");
@@ -129,6 +137,29 @@ namespace RamenServer
                     default:
                         break;
                 }
+
+                foreach (TcpClient client in clientList)
+                {
+                    SendData(client, sendDataDict);
+                }
+            }
+        }
+
+        public void SendData(TcpClient client, Dictionary<string, object> sendDataDict)
+        {
+            BinaryFormatter binaryFormatter = new BinaryFormatter();
+            MemoryStream memoryStream = new MemoryStream();
+            binaryFormatter.Serialize(memoryStream, sendDataDict);
+            byte[] sendData = memoryStream.ToArray();
+            NetworkStream networkStream = client.GetStream();
+
+            try
+            {
+                networkStream.Write(sendData, 0, sendData.Length);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
             }
         }
 
@@ -137,6 +168,19 @@ namespace RamenServer
         public static void AddLog(string log)
         {
             Append(log);
+        }
+
+        public List<string> LoadMenu()
+        {
+            List<string> menuList = new List<string>();
+            string sqlStr = "SELECT name FROM table_menu";
+            DataTable selectResult = DatabaseManager.GetDataTable(sqlStr);
+            foreach (DataRow row in selectResult.Rows)
+            {
+                menuList.Add(row[0].ToString());
+            }
+
+            return menuList;
         }
     }
 }

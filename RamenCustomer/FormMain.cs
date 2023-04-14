@@ -25,13 +25,12 @@ namespace RamenCustomer
             formTitle = form;
             formTitle.Hide();
             clientManager = (TcpClientManager)tcm;
-            Dictionary<string, object> d = new Dictionary<string, object>
-            {
-                { "method", "FormMainLoad" }
-            };
-            clientManager.SendData(d);
 
-            //TabMenu.ItemSize = new Size((TabMenu.Width / TabMenu.TabPages.Count) - 1, TabMenu.ItemSize.Height);
+            Dictionary<string, object> sendData = new Dictionary<string, object>
+            {
+                { "method", "LoadMenu" }
+            };
+            clientManager.SendData(sendData);
         }
 
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
@@ -47,6 +46,8 @@ namespace RamenCustomer
 
         private void uiButton2_Click(object sender, EventArgs e)
         {
+            string name;
+            string text;
             UIImageButton btn = new UIImageButton
             {
                 Size = new Size(258, 258),
@@ -54,7 +55,6 @@ namespace RamenCustomer
                 Name = "newbtn",
                 Text = "newbtn",
                 TextAlign = ContentAlignment.BottomCenter,
-                Image = Image.FromFile(@"C:\Users\user\Downloads\image.png"),
                 SizeMode = PictureBoxSizeMode.StretchImage,
             };
             btn.Click += SelectRamen;

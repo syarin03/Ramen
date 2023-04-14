@@ -28,12 +28,7 @@ namespace RamenCustomer
 
         private void FormTitle_Load(object sender, EventArgs e)
         {
-            Dictionary<string, object> data = new Dictionary<string, object>
-            {   
-                { "method", "FormTitleLoad" }
-            };
 
-            clientManager.SendData(data);
         }
 
         private void BtnTitleToMain_Click(object sender, EventArgs e)

@@ -12,6 +12,7 @@ namespace RamenCustomer
     {
         TcpClient client;
         NetworkStream networkStream;
+        List<string> menuList;
 
         public TcpClientManager()
         {
@@ -52,6 +53,21 @@ namespace RamenCustomer
                             (Dictionary<string, object>)binaryFormatter.Deserialize(memoryStream);
 
                         Console.WriteLine(receiveDataDict["method"]);
+                        string method = receiveDataDict["method"].ToString();
+
+                        switch (method)
+                        {
+                            case "LoadMenuResult":
+                                menuList = (List<string>)receiveDataDict["result"];
+                                foreach (string result in menuList)
+                                {
+                                    Console.WriteLine(result);
+                                }
+                                break;
+                            
+                            default:
+                                break;
+                        }
                     }
                 }
                 catch (Exception ex)
