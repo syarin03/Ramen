@@ -10,92 +10,93 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Sunny.UI;
 
 namespace RamenAdmin
 {
-    public partial class Form1 : Form
+    public partial class Form1 : UIForm
     {
-        TcpClient clientSocket = new TcpClient();
+        TcpClientManager clientManager;
 
         public Form1()
         {
             InitializeComponent();
+            clientManager = new TcpClientManager(this);
 
-            new Thread(delegate ()
-            {
-                InitSocket();
-            }).Start();
+            RequestStockData();
+            RequestOrderData();
         }
 
-        private void InitSocket()
+        private void BtnRefresh_Click(object sender, EventArgs e)
         {
-            try
+            RequestStockData();
+        }
+
+        private void BtnAddStock_Click(object sender, EventArgs e)
+        {
+            RequestAddStock();
+        }
+
+        private void RequestStockData()
+        {
+            Dictionary<string, object> sendData = new Dictionary<string, object>();
+            sendData.Add("method", "RequestStockData");
+            clientManager.SendData(sendData);
+        }
+
+        private void RequestOrderData()
+        {
+            Dictionary<string, object> sendData = new Dictionary<string, object>();
+            sendData.Add("method", "RequestOrderData");
+            clientManager.SendData(sendData);
+        }
+
+        private void RequestAddStock()
+        {
+            Dictionary<string, object> sendData = new Dictionary<string, object>();
+            List<string> addingStocks = new List<string>();
+            foreach (DataGridViewRow row in uiDataGridView1.Rows)
             {
-                clientSocket.Connect("10.10.21.116", 9999);
-                DisplayText("Client Started");
-                if (InvokeRequired)
+                if ((bool)row.Cells[0].Value)
                 {
-                    Invoke(new MethodInvoker(delegate ()
-                    {
-                        label1.Text = "Client Socket Program - Server Connected ...";
-                    }));
+                    addingStocks.Add((string)row.Cells[1].Value);
                 }
-                else
+            }
+            sendData.Add("method", "RequestAddStock");
+            sendData.Add("addingStocks", addingStocks);
+            clientManager.SendData(sendData);
+        }
+
+        public void UpdateStock(DataTable dataTable)
+        {
+            Invoke(new MethodInvoker(delegate ()
+            {
+                uiDataGridView1.ClearRows();
+                foreach (DataRow row in dataTable.Rows)
                 {
-                    label1.Text = "Client Socket Program - Server Connected ...";
+                    string name = (string)row["name"];
+                    int stock = (int)row["menu_stock"];
+                    uiDataGridView1.AddRow(false, name, stock);
                 }
-            }
-            catch (SocketException se)
-            {
-                MessageBox.Show(se.Message, "Error");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Error");
-            }
+            }));
         }
 
-        private void FormTitle_Click(object sender, EventArgs e)
+        public void LoadOrder(DataTable dataTable)
         {
-            //string sendData = "hello";  // testBox3 의 내용을 sendData1 변수에 저장
-            //Writer.WriteLine(sendData);  // 스트림라이터를 통해 데이타를 전송
-            //FormMain formMain = new FormMain(this);
-            //formMain.Show();
-        }
-
-        private void FormTitle_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            clientSocket?.Close();
-        }
-
-        private void DisplayText(string text)
-        {
-            if (richTextBox1.InvokeRequired)
+            Invoke(new MethodInvoker(delegate ()
             {
-                richTextBox1.BeginInvoke(new MethodInvoker(delegate
+                TableMenuList.ClearRows();
+                foreach (DataRow row in dataTable.Rows)
                 {
-                    richTextBox1.AppendText(Environment.NewLine + " >> " + text);
-                }));
-            }
-            else
-                richTextBox1.AppendText(Environment.NewLine + " >> " + text);
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            NetworkStream stream = clientSocket.GetStream();
-            byte[] sbuffer = Encoding.Unicode.GetBytes(richTextBox2.Text + "$");
-            stream.Write(sbuffer, 0, sbuffer.Length);
-            stream.Flush();
-
-            byte[] rbuffer = new byte[1024];
-            stream.Read(rbuffer, 0, rbuffer.Length);
-            string msg = Encoding.Unicode.GetString(rbuffer);
-            msg = "Data from Server : " + msg;
-            DisplayText(msg);
-
-            richTextBox2.Text = "";
-            richTextBox2.Focus();
+                    string orderDatetime = (string)row["order_date"];
+                    string name = (string)row["name"];
+                    decimal count = (decimal)row["count"];
+                    decimal price = (decimal)row["price"] * count;
+                    if (orderDatetime == "합계")
+                        price = (decimal)row["price"];
+                    TableMenuList.AddRow(orderDatetime, name, count, price);
+                }
+            }));
         }
     }
 }

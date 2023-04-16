@@ -121,7 +121,7 @@
             this.BtnServerReboot.Style = Sunny.UI.UIStyle.Custom;
             this.BtnServerReboot.StyleCustomMode = true;
             this.BtnServerReboot.TabIndex = 0;
-            this.BtnServerReboot.Text = "서버 재가동";
+            this.BtnServerReboot.Text = "서버 리부팅";
             this.BtnServerReboot.Click += new System.EventHandler(this.BtnServerReboot_Click);
             // 
             // flowLayoutPanel1

@@ -49,7 +49,7 @@ namespace RamenServer
             }
         }
 
-        public static void InsertData(string mysql)
+        public static void CommitData(string mysql)
         {
             using (MySqlConnection myConn = new MySqlConnection(connect_str))
             {

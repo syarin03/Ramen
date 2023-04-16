@@ -16,7 +16,7 @@ namespace RamenCustomer
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new FormTitle());
+            Application.Run(new FormMain());
         }
     }
 }

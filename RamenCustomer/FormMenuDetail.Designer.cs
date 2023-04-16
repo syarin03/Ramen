@@ -28,132 +28,112 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.BtnOptionRamenCancel = new Sunny.UI.UIButton();
-            this.uiButton1 = new Sunny.UI.UIButton();
-            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
-            this.uiLabel1 = new Sunny.UI.UILabel();
-            this.uiImageButton1 = new Sunny.UI.UIImageButton();
-            this.uiImageButton2 = new Sunny.UI.UIImageButton();
-            this.uiImageButton3 = new Sunny.UI.UIImageButton();
-            this.flowLayoutPanel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.uiImageButton1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.uiImageButton2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.uiImageButton3)).BeginInit();
+            this.BtnDetailCancel = new Sunny.UI.UIButton();
+            this.BtnAddMenu = new Sunny.UI.UIButton();
+            this.LabelMenuName = new Sunny.UI.UILabel();
+            this.LabelMenuPrice = new Sunny.UI.UILabel();
+            this.ImageMenu = new System.Windows.Forms.PictureBox();
+            this.CountMenu = new Sunny.UI.UIIntegerUpDown();
+            ((System.ComponentModel.ISupportInitialize)(this.ImageMenu)).BeginInit();
             this.SuspendLayout();
             // 
-            // BtnOptionRamenCancel
+            // BtnDetailCancel
             // 
-            this.BtnOptionRamenCancel.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.BtnOptionRamenCancel.Font = new System.Drawing.Font("나눔바른고딕", 12F);
-            this.BtnOptionRamenCancel.Location = new System.Drawing.Point(535, 3);
-            this.BtnOptionRamenCancel.MinimumSize = new System.Drawing.Size(1, 1);
-            this.BtnOptionRamenCancel.Name = "BtnOptionRamenCancel";
-            this.BtnOptionRamenCancel.Size = new System.Drawing.Size(63, 35);
-            this.BtnOptionRamenCancel.TabIndex = 0;
-            this.BtnOptionRamenCancel.Text = "X";
-            this.BtnOptionRamenCancel.Click += new System.EventHandler(this.BtnOptionRamenCancel_Click);
+            this.BtnDetailCancel.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.BtnDetailCancel.Font = new System.Drawing.Font("나눔바른고딕", 12F);
+            this.BtnDetailCancel.Location = new System.Drawing.Point(535, 3);
+            this.BtnDetailCancel.MinimumSize = new System.Drawing.Size(1, 1);
+            this.BtnDetailCancel.Name = "BtnDetailCancel";
+            this.BtnDetailCancel.Size = new System.Drawing.Size(63, 35);
+            this.BtnDetailCancel.TabIndex = 0;
+            this.BtnDetailCancel.Text = "X";
+            this.BtnDetailCancel.Click += new System.EventHandler(this.BtnOptionRamenCancel_Click);
             // 
-            // uiButton1
+            // BtnAddMenu
             // 
-            this.uiButton1.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.uiButton1.Font = new System.Drawing.Font("Microsoft YaHei", 12F);
-            this.uiButton1.Location = new System.Drawing.Point(498, 562);
-            this.uiButton1.MinimumSize = new System.Drawing.Size(1, 1);
-            this.uiButton1.Name = "uiButton1";
-            this.uiButton1.Size = new System.Drawing.Size(100, 35);
-            this.uiButton1.TabIndex = 1;
-            this.uiButton1.Text = "추가";
+            this.BtnAddMenu.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.BtnAddMenu.Font = new System.Drawing.Font("Microsoft YaHei", 12F);
+            this.BtnAddMenu.Location = new System.Drawing.Point(498, 162);
+            this.BtnAddMenu.MinimumSize = new System.Drawing.Size(1, 1);
+            this.BtnAddMenu.Name = "BtnAddMenu";
+            this.BtnAddMenu.Size = new System.Drawing.Size(100, 35);
+            this.BtnAddMenu.TabIndex = 1;
+            this.BtnAddMenu.Text = "추가";
+            this.BtnAddMenu.Click += new System.EventHandler(this.BtnAddMenu_Click);
             // 
-            // flowLayoutPanel1
+            // LabelMenuName
             // 
-            this.flowLayoutPanel1.Controls.Add(this.uiImageButton1);
-            this.flowLayoutPanel1.Controls.Add(this.uiImageButton2);
-            this.flowLayoutPanel1.Controls.Add(this.uiImageButton3);
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(12, 44);
-            this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(576, 512);
-            this.flowLayoutPanel1.TabIndex = 2;
+            this.LabelMenuName.Font = new System.Drawing.Font("Microsoft YaHei", 12F);
+            this.LabelMenuName.Location = new System.Drawing.Point(202, 9);
+            this.LabelMenuName.Name = "LabelMenuName";
+            this.LabelMenuName.Size = new System.Drawing.Size(100, 23);
+            this.LabelMenuName.TabIndex = 3;
+            this.LabelMenuName.Text = "메뉴 이름";
+            this.LabelMenuName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // uiLabel1
+            // LabelMenuPrice
             // 
-            this.uiLabel1.Font = new System.Drawing.Font("Microsoft YaHei", 12F);
-            this.uiLabel1.Location = new System.Drawing.Point(13, 14);
-            this.uiLabel1.Name = "uiLabel1";
-            this.uiLabel1.Size = new System.Drawing.Size(100, 23);
-            this.uiLabel1.TabIndex = 3;
-            this.uiLabel1.Text = "메뉴 이름";
-            this.uiLabel1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.LabelMenuPrice.Font = new System.Drawing.Font("Microsoft YaHei", 12F);
+            this.LabelMenuPrice.Location = new System.Drawing.Point(202, 45);
+            this.LabelMenuPrice.Name = "LabelMenuPrice";
+            this.LabelMenuPrice.Size = new System.Drawing.Size(100, 23);
+            this.LabelMenuPrice.TabIndex = 3;
+            this.LabelMenuPrice.Text = "메뉴 가격";
+            this.LabelMenuPrice.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // uiImageButton1
+            // ImageMenu
             // 
-            this.uiImageButton1.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.uiImageButton1.Font = new System.Drawing.Font("나눔바른고딕", 12F);
-            this.uiImageButton1.Location = new System.Drawing.Point(3, 3);
-            this.uiImageButton1.Name = "uiImageButton1";
-            this.uiImageButton1.Size = new System.Drawing.Size(186, 186);
-            this.uiImageButton1.Style = Sunny.UI.UIStyle.Custom;
-            this.uiImageButton1.TabIndex = 1;
-            this.uiImageButton1.TabStop = false;
-            this.uiImageButton1.Text = "uiImageButton1";
-            this.uiImageButton1.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.ImageMenu.Location = new System.Drawing.Point(2, 3);
+            this.ImageMenu.Name = "ImageMenu";
+            this.ImageMenu.Size = new System.Drawing.Size(194, 194);
+            this.ImageMenu.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.ImageMenu.TabIndex = 4;
+            this.ImageMenu.TabStop = false;
             // 
-            // uiImageButton2
+            // CountMenu
             // 
-            this.uiImageButton2.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.uiImageButton2.Font = new System.Drawing.Font("나눔바른고딕", 12F);
-            this.uiImageButton2.Location = new System.Drawing.Point(195, 3);
-            this.uiImageButton2.Name = "uiImageButton2";
-            this.uiImageButton2.Size = new System.Drawing.Size(186, 186);
-            this.uiImageButton2.Style = Sunny.UI.UIStyle.Custom;
-            this.uiImageButton2.TabIndex = 1;
-            this.uiImageButton2.TabStop = false;
-            this.uiImageButton2.Text = "uiImageButton1";
-            this.uiImageButton2.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-            // 
-            // uiImageButton3
-            // 
-            this.uiImageButton3.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.uiImageButton3.Font = new System.Drawing.Font("나눔바른고딕", 12F);
-            this.uiImageButton3.Location = new System.Drawing.Point(387, 3);
-            this.uiImageButton3.Name = "uiImageButton3";
-            this.uiImageButton3.Size = new System.Drawing.Size(186, 186);
-            this.uiImageButton3.Style = Sunny.UI.UIStyle.Custom;
-            this.uiImageButton3.TabIndex = 1;
-            this.uiImageButton3.TabStop = false;
-            this.uiImageButton3.Text = "uiImageButton1";
-            this.uiImageButton3.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.CountMenu.Font = new System.Drawing.Font("Microsoft YaHei", 12F);
+            this.CountMenu.Location = new System.Drawing.Point(206, 83);
+            this.CountMenu.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.CountMenu.Minimum = 1;
+            this.CountMenu.MinimumSize = new System.Drawing.Size(100, 0);
+            this.CountMenu.Name = "CountMenu";
+            this.CountMenu.ShowText = false;
+            this.CountMenu.Size = new System.Drawing.Size(100, 30);
+            this.CountMenu.TabIndex = 5;
+            this.CountMenu.Text = "Count";
+            this.CountMenu.TextAlignment = System.Drawing.ContentAlignment.MiddleCenter;
+            this.CountMenu.Value = 1;
             // 
             // FormMenuDetail
             // 
             this.AllowShowTitle = false;
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            this.ClientSize = new System.Drawing.Size(600, 600);
-            this.Controls.Add(this.uiLabel1);
-            this.Controls.Add(this.flowLayoutPanel1);
-            this.Controls.Add(this.uiButton1);
-            this.Controls.Add(this.BtnOptionRamenCancel);
+            this.ClientSize = new System.Drawing.Size(600, 200);
+            this.Controls.Add(this.CountMenu);
+            this.Controls.Add(this.ImageMenu);
+            this.Controls.Add(this.LabelMenuPrice);
+            this.Controls.Add(this.LabelMenuName);
+            this.Controls.Add(this.BtnAddMenu);
+            this.Controls.Add(this.BtnDetailCancel);
             this.Font = new System.Drawing.Font("나눔바른고딕", 12F);
             this.Name = "FormMenuDetail";
             this.Padding = new System.Windows.Forms.Padding(0);
             this.ShowTitle = false;
             this.Text = "FormMenuDetail";
             this.ZoomScaleRect = new System.Drawing.Rectangle(15, 15, 800, 450);
-            this.flowLayoutPanel1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.uiImageButton1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.uiImageButton2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.uiImageButton3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.ImageMenu)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private Sunny.UI.UIButton BtnOptionRamenCancel;
-        private Sunny.UI.UIButton uiButton1;
-        private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
-        private Sunny.UI.UILabel uiLabel1;
-        private Sunny.UI.UIImageButton uiImageButton1;
-        private Sunny.UI.UIImageButton uiImageButton2;
-        private Sunny.UI.UIImageButton uiImageButton3;
+        private Sunny.UI.UIButton BtnDetailCancel;
+        private Sunny.UI.UIButton BtnAddMenu;
+        private Sunny.UI.UILabel LabelMenuName;
+        private Sunny.UI.UILabel LabelMenuPrice;
+        private System.Windows.Forms.PictureBox ImageMenu;
+        private Sunny.UI.UIIntegerUpDown CountMenu;
     }
 }

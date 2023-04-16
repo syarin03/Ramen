@@ -9,6 +9,9 @@ using MySql.Data.MySqlClient;
 using System.Management;
 using System.Data;
 using MySqlX.XDevAPI;
+using System.Text;
+using System.Collections;
+using System.Diagnostics;
 
 namespace RamenServer
 {
@@ -20,6 +23,7 @@ namespace RamenServer
         Queue<Dictionary<string, object>> ReceiveDataQueue = new Queue<Dictionary<string, object>>();
         Thread listenerThread;
         Thread processThread;
+        public bool isRun = false;
 
         public TcpServerManager()
         {
@@ -29,6 +33,11 @@ namespace RamenServer
 
         public void ServerStart()
         {
+            if (isRun)
+            {
+                AddLog("Server is already running");
+                return;
+            }
             listener.Start();
 
             listenerThread = new Thread(ServerThread)
@@ -44,10 +53,17 @@ namespace RamenServer
             processThread.Start();
 
             AddLog("Server Start");
+
+            isRun = true;
         }
 
         public void ServerStop()
         {
+            if (!isRun)
+            {
+                AddLog("Server is not running");
+                return;
+            }
             foreach (TcpClient client in clientList)
             {
                 client.Close();
@@ -55,6 +71,8 @@ namespace RamenServer
             listener.Stop();
 
             AddLog("Server Stop");
+
+            isRun = false;
         }
 
         private void ServerThread()
@@ -128,11 +146,33 @@ namespace RamenServer
                 {
                     case "LoadMenu":
                         sendDataDict.Add("method", "LoadMenuResult");
-                        List<string> menuList = LoadMenu();
-                        sendDataDict.Add("result", menuList);
+                        DataTable menuTable = LoadMenu();
+                        sendDataDict.Add("result", menuTable);
                         break;
-                    case "what":
-                        AddLog("what");
+                    case "Order":
+                        sendDataDict.Add("method", "OrderResult");
+                        DataTable orderTable = (DataTable)receiveDataDict["values"];
+                        InsertOrder(orderTable);
+                        sendDataDict.Add("method", "LoadOrderDataResult");
+                        DataTable loadOrderTable = LoadOrderData();
+                        sendDataDict.Add("result", loadOrderTable);
+                        break;
+                    case "RequestStockData":
+                        sendDataDict.Add("method", "StockDataResult");
+                        DataTable stockTable = LoadStockData();
+                        sendDataDict.Add("result", stockTable);
+                        break;
+                    case "RequestAddStock":
+                        List<string> addingStocks = (List<string>)receiveDataDict["addingStocks"];
+                        AddStocks(addingStocks);
+                        sendDataDict.Add("method", "StockDataResult");
+                        DataTable stockTable2 = LoadStockData();
+                        sendDataDict.Add("result", stockTable2);
+                        break;
+                    case "RequestOrderData":
+                        sendDataDict.Add("method", "LoadOrderDataResult");
+                        DataTable loadOrderTable2 = LoadOrderData();
+                        sendDataDict.Add("result", loadOrderTable2);
                         break;
                     default:
                         break;
@@ -170,17 +210,83 @@ namespace RamenServer
             Append(log);
         }
 
-        public List<string> LoadMenu()
+        public void AddStocks(List<string> stocks)
         {
-            List<string> menuList = new List<string>();
-            string sqlStr = "SELECT name FROM table_menu";
-            DataTable selectResult = DatabaseManager.GetDataTable(sqlStr);
-            foreach (DataRow row in selectResult.Rows)
+            foreach (string stock in stocks)
             {
-                menuList.Add(row[0].ToString());
+                string sql = $"UPDATE table_stock SET menu_stock = menu_stock + 10 WHERE num = (SELECT num FROM table_menu WHERE name = '{stock}')";
+                DatabaseManager.CommitData(sql);
+            }
+        }
+
+        public DataTable LoadOrderData()
+        {
+            StringBuilder sql = new StringBuilder(1024);
+            sql.AppendLine($"SELECT                      ");
+            sql.AppendLine($"    a.order_date,           ");
+            sql.AppendLine($"    b.name,                 ");
+            sql.AppendLine($"    a.count,                ");
+            sql.AppendLine($"    b.price                 ");
+            sql.AppendLine($"FROM table_order a          ");
+            sql.AppendLine($"LEFT JOIN table_menu b      ");
+            sql.AppendLine($"ON a.menu_num = b.num       ");
+            sql.AppendLine($"                            ");
+            sql.AppendLine($"UNION                       ");
+            sql.AppendLine($"                            ");
+            sql.AppendLine($"SELECT                      ");
+            sql.AppendLine($"    '합계',                  ");
+            sql.AppendLine($"    '',                     ");
+            sql.AppendLine($"    SUM(a.count) AS count,  ");
+            sql.AppendLine($"    SUM(b.price) as price   ");
+            sql.AppendLine($"FROM table_order a          ");
+            sql.AppendLine($"LEFT JOIN table_menu b      ");
+            sql.AppendLine($"ON a.menu_num = b.num       ");
+            DataTable dataTable = DatabaseManager.GetDataTable(sql.ToString());
+            return dataTable;
+        }
+
+        public DataTable LoadStockData()
+        {
+            StringBuilder sql = new StringBuilder(1024);
+            sql.AppendLine($"SELECT                     ");
+            sql.AppendLine($"    B.name, a.menu_stock   ");
+            sql.AppendLine($"FROM table_stock a         ");
+            sql.AppendLine($"LEFT JOIN table_menu b     ");
+            sql.AppendLine($"ON a.menu_num = b.num      ");
+            DataTable dataTable = DatabaseManager.GetDataTable(sql.ToString());
+            return dataTable;
+        }
+
+        public DataTable LoadMenu()
+        {
+            string sqlStr = "SELECT name, price, category, image FROM table_menu";
+            DataTable selectResult = DatabaseManager.GetDataTable(sqlStr);
+
+            return selectResult;
+        }
+
+        public void InsertOrder(DataTable orderTable)
+        {
+            string sqlStr = "SELECT MAX(order_num) FROM table_order";
+            DataTable selectResult = DatabaseManager.GetDataTable(sqlStr);
+            int order_num;
+            if (string.IsNullOrEmpty(selectResult.Rows[0][0].ToString()))
+            {
+                order_num = 0;
+            }
+            else
+            {
+                order_num = (int)selectResult.Rows[0][0] + 1;
             }
 
-            return menuList;
+            foreach (DataRow row in orderTable.Rows)
+            {
+                sqlStr = $"INSERT INTO table_order (order_num, menu_num, count, order_date) " +
+                    $"VALUES ({order_num}, (SELECT num FROM table_menu WHERE name = \"{row[0]}\"), {row[1]}, now())";
+                DatabaseManager.CommitData(sqlStr);
+                sqlStr = $"UPDATE table_stock SET menu_stock = menu_stock - {row[1]} WHERE menu_num = (SELECT num FROM table_menu WHERE name = \"{row[0]}\")";
+                DatabaseManager.CommitData(sqlStr);
+            }
         }
     }
 }

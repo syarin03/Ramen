@@ -7,15 +7,15 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace RamenCustomer
+namespace RamenAdmin
 {
     public class TcpClientManager
     {
         TcpClient client;
         NetworkStream networkStream;
-        FormMain mainForm;
+        Form1 mainForm;
 
-        public TcpClientManager(FormMain mainForm)
+        public TcpClientManager(Form1 mainForm)
         {
             this.mainForm = mainForm;
             Thread thread = new Thread(() => ThreadProc())
@@ -60,18 +60,14 @@ namespace RamenCustomer
 
                         switch (method)
                         {
-                            case "LoadMenuResult":
-                                var menuList = (DataTable)receiveDataDict["result"];
-                                foreach (DataRow result in menuList.Rows)
-                                {
-                                    string name = result["name"].ToString();
-                                    string category = result["category"].ToString();
-                                    int price = int.Parse(result["price"].ToString());
-                                    string image = result["image"].ToString();
-                                    mainForm.menuAdd(name, category, price, image);
-                                }
+                            case "StockDataResult":
+                                DataTable stockData = (DataTable)receiveDataDict["result"];
+                                mainForm.UpdateStock(stockData);
                                 break;
-
+                            case "LoadOrderDataResult":
+                                DataTable LoadorderData = (DataTable)receiveDataDict["result"];
+                                mainForm.LoadOrder(LoadorderData);
+                                break;
                             default:
                                 break;
                         }
