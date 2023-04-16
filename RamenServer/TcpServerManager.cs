@@ -153,6 +153,7 @@ namespace RamenServer
                         sendDataDict.Add("method", "OrderResult");
                         DataTable orderTable = (DataTable)receiveDataDict["values"];
                         InsertOrder(orderTable);
+                        sendDataDict.Clear();
                         sendDataDict.Add("method", "LoadOrderDataResult");
                         DataTable loadOrderTable = LoadOrderData();
                         sendDataDict.Add("result", loadOrderTable);

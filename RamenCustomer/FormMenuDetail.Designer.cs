@@ -47,7 +47,7 @@
             this.BtnDetailCancel.Size = new System.Drawing.Size(63, 35);
             this.BtnDetailCancel.TabIndex = 0;
             this.BtnDetailCancel.Text = "X";
-            this.BtnDetailCancel.Click += new System.EventHandler(this.BtnOptionRamenCancel_Click);
+            this.BtnDetailCancel.Click += new System.EventHandler(this.BtnDetailClose_Click);
             // 
             // BtnAddMenu
             // 

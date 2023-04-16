@@ -29,7 +29,7 @@ namespace RamenCustomer
             };
             clientManager.SendData(sendData);
 
-            BtnTitleToMain.Size = this.Size;
+            BtnTitleToMain.Size = Size;
 
             UILocalizeHelper.SetEN();
         }

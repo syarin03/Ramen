@@ -28,7 +28,7 @@ namespace RamenCustomer
             this.form = form;
         }
 
-        private void BtnOptionRamenCancel_Click(object sender, EventArgs e)
+        private void BtnDetailClose_Click(object sender, EventArgs e)
         {
             Close();
         }
